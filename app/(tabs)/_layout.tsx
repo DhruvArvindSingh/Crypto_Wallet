@@ -1,45 +1,100 @@
-import { Tabs } from 'expo-router';
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import React from 'react';
 import { Platform } from 'react-native';
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import Home from './home'
+import Profile from "./profile";
+import Trade from "./trade";
+import Portfolio from "./portfolio";
+import Market from "./market";
 
+
+import icons from '@/constants/icons.js';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { COLORS } from "@/constants"
+import { TabIcon } from '@/components';
+
+const Tab = createBottomTabNavigator()
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <Tabs
+    <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
-      <Tabs.Screen
-        name="index"
+        tabBarShowLabel: false,
+        tabBarStyle: {
+          backgroundColor: COLORS.primary,
+          borderTopColor: "transparent",
+        }
+      }}
+    >
+      <Tab.Screen
+        name="home"
+        component={Home}
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarIcon: ({ focused }) => (
+            <TabIcon
+              focused={focused}
+              icon={icons.home}
+              label="Home"
+            />
+          )
         }}
       />
-      <Tabs.Screen
-        name="explore"
+      <Tab.Screen
+        name="portfolio"
+        component={Portfolio}
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          tabBarIcon: ({ focused }) => (
+            <TabIcon
+              focused={focused}
+              icon={icons.briefcase}
+              label="Porfolio"
+            />
+          ),
         }}
       />
-    </Tabs>
+      <Tab.Screen
+        name="trade"
+        component={Trade}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <TabIcon
+              focused={focused}
+              icon={icons.trade}
+              label="Trade"
+              isTrade={true}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Market"
+        component={Market}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <TabIcon
+              focused={focused}
+              icon={icons.market}
+              label="Market"
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="profile"
+        component={Profile}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <TabIcon
+              focused={focused}
+              icon={icons.profile}
+              label="Profile"
+            />
+          ),
+        }}
+      />
+    </Tab.Navigator>
   );
 }
