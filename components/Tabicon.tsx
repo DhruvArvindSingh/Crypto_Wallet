@@ -6,7 +6,7 @@ import { FONTS, COLORS } from '../constants';
 interface TabIconProps {
     focused: boolean;
     icon: any;
-    label: string;
+    label?: string;
     isTrade?: boolean;
     iconStyle?: any;
     labelStyle?: any;
@@ -27,7 +27,8 @@ const TabIcon = ({ focused, icon, label, isTrade = false, iconStyle, labelStyle 
                 <Image
                     source={icon}
                     resizeMode="contain"
-                    style={{ width: 25, height: 25, tintColor: COLORS.white, ...iconStyle }}
+                    style={{ width: 25, height: 25, ...iconStyle }}
+                    tintColor={COLORS.white}
                 />
                 <Text style={{ color: COLORS.white, ...FONTS.h4 }}>Trade</Text>
             </View>
@@ -38,17 +39,17 @@ const TabIcon = ({ focused, icon, label, isTrade = false, iconStyle, labelStyle 
                 <Image
                     source={icon}
                     resizeMode="contain"
-                    style={{
-                        width: 25, height: 25, tintColor: focused ? COLORS.white : COLORS.secondary,
-                        ...iconStyle
-                    }}
+                    style={{ width: 25, height: 25, ...iconStyle }}
+                    tintColor={focused ? COLORS.white : COLORS.secondary}
                 />
-                <Text style={{
-                    color: focused ? COLORS.white : COLORS.secondary,
-                    ...FONTS.h4
-                }}>
-                    {label}
-                </Text>
+                {label && (
+                    <Text style={{
+                        color: focused ? COLORS.white : COLORS.secondary,
+                        ...FONTS.h4
+                    }}>
+                        {label}
+                    </Text>
+                )}
             </View>
         )
     }

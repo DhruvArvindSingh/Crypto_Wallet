@@ -6,15 +6,20 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
+import { thunk } from 'redux-thunk';
 import rootReducer from '@/stores/rootReducer';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-const store = createStore(rootReducer);
+// Create store with thunk middleware
+const store = createStore(
+  rootReducer,
+  applyMiddleware(thunk)
+);
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();

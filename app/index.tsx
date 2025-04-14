@@ -11,3 +11,8 @@ export {
     Profile,
     MainLayout,
 }
+
+// Add default export
+export default function Index() {
+    return <Home />;
+}
