@@ -1,6 +1,6 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import React from 'react';
-import { Platform } from 'react-native';
+import { Platform, TouchableOpacity } from 'react-native';
 
 import Home from './home'
 import Profile from "./profile";
@@ -13,6 +13,23 @@ import icons from '@/constants/icons.js';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { COLORS } from "@/constants"
 import { TabIcon } from '@/components';
+
+const TabBarButton = ({ children, onPress }: any) => {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      {children}
+    </TouchableOpacity>
+  );
+};
+
+
 
 const Tab = createBottomTabNavigator()
 export default function TabLayout() {
@@ -67,7 +84,14 @@ export default function TabLayout() {
               isTrade={true}
             />
           ),
+          tabBarButton: (props) => (
+            <TabBarButton
+              {...props}
+              onPress={() => console.log("pressed")}
+            />
+          ),
         }}
+
       />
       <Tab.Screen
         name="Market"

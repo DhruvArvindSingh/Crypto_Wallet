@@ -1,11 +1,14 @@
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
+import MainLayout from './_mainLayout';
 
 const Profile = () => {
     return (
-        <View>
-            <Text>Profile</Text>
-        </View>
+        <MainLayout>
+            <View>
+                <Text>Profile</Text>
+            </View>
+        </MainLayout>
     );
 }
 

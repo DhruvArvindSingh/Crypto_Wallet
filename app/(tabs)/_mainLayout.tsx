@@ -8,7 +8,6 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
         <View
             style={{
                 flex: 1,
-                backgroundColor: COLORS.black,
             }}
         >
             {children}
