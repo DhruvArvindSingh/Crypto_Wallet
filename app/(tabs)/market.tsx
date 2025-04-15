@@ -15,3 +15,4 @@ const Market = () => {
 const styles = StyleSheet.create({})
 
 export default Market;
+
