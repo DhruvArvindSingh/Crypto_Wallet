@@ -1,4 +1,6 @@
 import TabIcon from "./Tabicon";
+import BalanceInfo from "./BalanceInfo";
+import IconTextButton from "./IconTextButton";
 
-export { TabIcon };
+export { TabIcon, BalanceInfo, IconTextButton };
 
