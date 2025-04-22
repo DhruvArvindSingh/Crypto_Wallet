@@ -10,7 +10,6 @@ import Trade from "./trade";
 import Portfolio from "./portfolio";
 import Market from "./market";
 
-
 import icons from '@/constants/icons.js';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { COLORS } from "@/constants"
@@ -31,9 +30,8 @@ const TabBarButton = ({ children, onPress }: any) => {
   );
 };
 
+const Tab = createBottomTabNavigator();
 
-
-const Tab = createBottomTabNavigator()
 function TabLayout({ setTradeModalVisibility, isTradeModalVisible }: any) {
   const colorScheme = useColorScheme();
 
@@ -41,6 +39,7 @@ function TabLayout({ setTradeModalVisibility, isTradeModalVisible }: any) {
     console.log("tradeTabButtonOnClickHandler")
     setTradeModalVisibility(!isTradeModalVisible)
   }
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -49,6 +48,9 @@ function TabLayout({ setTradeModalVisibility, isTradeModalVisible }: any) {
         tabBarStyle: {
           backgroundColor: COLORS.primary,
           borderTopColor: "transparent",
+          height: 84,
+          justifyContent: "center",
+          // alignItems: "center",
         }
       }}
     >
@@ -58,14 +60,14 @@ function TabLayout({ setTradeModalVisibility, isTradeModalVisible }: any) {
         options={{
           tabBarIcon: ({ focused }) => {
             if (!isTradeModalVisible) {
-            return (
-              <TabIcon
+              return (
+                <TabIcon
                   focused={focused}
                   icon={icons.home}
                   label="Home"
                 />
               )
-            } 
+            }
           }
         }}
         listeners={{
@@ -105,30 +107,29 @@ function TabLayout({ setTradeModalVisibility, isTradeModalVisible }: any) {
         component={Trade}
         options={{
           tabBarIcon: ({ focused }) => {
-              return (
-                <TabIcon
-                  focused={focused}
-                  icon={ isTradeModalVisible ? icons.close : icons.trade}
-                  iconStyle={isTradeModalVisible ? {
-                    width: 15,
-                    height: 15,
-                  } : {
-                    width: 25,
-                    height: 25,
-                  }}
-                  label="Trade"
-                  isTrade={true}
-                />
-              )
+            return (
+              <TabIcon
+                focused={focused}
+                icon={isTradeModalVisible ? icons.close : icons.trade}
+                iconStyle={isTradeModalVisible ? {
+                  width: 15,
+                  height: 15,
+                } : {
+                  width: 25,
+                  height: 25,
+                }}
+                label="Trade"
+                isTrade={true}
+              />
+            )
           },
           tabBarButton: (props) => (
             <TabBarButton
               {...props}
-              onPress={()=>tradeTabButtonOnClickHandler()}
+              onPress={() => tradeTabButtonOnClickHandler()}
             />
           ),
         }}
-
       />
       <Tab.Screen
         name="Market"
@@ -194,4 +195,8 @@ function mapDispatchToProps(dispatch: any) {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(TabLayout)
+const ConnectedTabLayout = connect(mapStateToProps, mapDispatchToProps)(TabLayout);
+
+export default function Layout() {
+  return <ConnectedTabLayout />;
+}

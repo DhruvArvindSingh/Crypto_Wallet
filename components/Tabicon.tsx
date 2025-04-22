@@ -35,7 +35,7 @@ const TabIcon = ({ focused, icon, label, isTrade = false, iconStyle, labelStyle 
         )
     } else {
         return (
-            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 50 }}>
                 <Image
                     source={icon}
                     resizeMode="contain"
