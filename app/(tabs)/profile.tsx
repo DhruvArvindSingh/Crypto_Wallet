@@ -2,19 +2,15 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, Image, Switch } from 'react-native';
 import MainLayout from './_mainLayout';
 import { HeaderBar } from '../../components';
-import { COLORS, FONTS, SIZES, dummyData, icons } from '../../constants';
-
+import { COLORS, FONTS, SIZES, icons } from '../../constants';
+import ProfileDisplay from '@/components/ProfileDisplay';
 
 const SectionTitle = ({ title }: { title: string }) => {
     return (
         <View style={{
             marginTop: SIZES.padding,
-            // flexDirection: 'row',
-            // justifyContent: 'space-between',
-            // alignItems: 'center',
         }}>
             <Text style={{ ...FONTS.h4, color: COLORS.lightGray3 }}>{title}</Text>
-
         </View>
     );
 };
@@ -78,7 +74,6 @@ const Profile = () => {
                     flex: 1,
                     paddingHorizontal: SIZES.padding,
                     backgroundColor: COLORS.black,
-
                 }}
             >
                 {/* Header */}
@@ -88,58 +83,8 @@ const Profile = () => {
 
                 {/* Details */}
                 <ScrollView>
-                    {/* Email And User_id */}
-                    <View
-                        style={{
-                            flexDirection: 'row',
-                            marginTop: SIZES.radius,
-                        }}
-                    >
-                        <View
-                            style={{
-                                flex: 1,
-                            }}
-                        >
-                            <Text
-                                style={{
-                                    ...FONTS.h3,
-                                    color: COLORS.white,
-                                }}
-                            >
-                                {dummyData.profile.email}</Text>
-                            <Text
-                                style={{
-                                    ...FONTS.body4,
-                                    color: COLORS.lightGreen,
-                                }}
-                            >
-                                ID:{dummyData.profile.id}</Text>
-                        </View>
-
-                        {/* Status */}
-                        <View
-                            style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                            }}
-                        >
-                            <Image
-                                source={icons.verified}
-                                style={{
-                                    width: 25,
-                                    height: 25,
-                                }}
-                            />
-                            <Text
-                                style={{
-                                    ...FONTS.body4,
-                                    color: COLORS.lightGreen,
-                                    marginLeft: SIZES.base,
-                                }}
-                            >
-                                Verified</Text>
-                        </View>
-                    </View>
+                    {/* User Profile Info */}
+                    <ProfileDisplay />
 
                     {/* App Version */}
                     <SectionTitle
@@ -193,8 +138,6 @@ const Profile = () => {
                         onPress={(value) => setTouchId(value ?? false)}
                     />
                 </ScrollView>
-
-
             </View>
         </MainLayout>
     );
