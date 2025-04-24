@@ -1,0 +1,18 @@
+### Test signup endpoint
+POST http://localhost:5000/signup
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+### Test signin endpoint
+POST http://localhost:5000/signin
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123"
+} 
