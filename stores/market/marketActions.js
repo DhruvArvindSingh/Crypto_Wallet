@@ -1,4 +1,5 @@
 import axios from "axios";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Holdins / My Holdings
 
@@ -22,9 +23,22 @@ export const getHoldingsFailure = (error) => ({
     payload: { error },
 });
 
+const getWallets = async () => {
+    try {
+        const walletsData = await AsyncStorage.getItem('wallets');
+        return walletsData ? JSON.parse(walletsData[0]) : [];
+    } catch (error) {
+        console.error('Error fetching wallets:', error);
+        return [];
+    }
+}
+
+
 export function getHoldings(holdings = [], currency = "usd", coinList = [], orderBy = "market_cap_desc", sparkline = true, priceChangePerc = "7d", page = 1, perPage = 10) {
-    return dispatch => {
+    return async dispatch => {
         dispatch(getHoldingsBegin());
+        const wallets = getWallets();
+        // let nholdings = [...holdings, ...wallets];
         let ids = holdings.map((coin) => coin.id).join(",");
         let apiUrl = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=${currency}&order=${orderBy}&per_page=${perPage}&page=${page}&sparkline=${sparkline}&price_change_percentage=${priceChangePerc}&ids=${ids}`;
 

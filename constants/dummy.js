@@ -12,6 +12,10 @@ export const holdings = [
     {
         id: "dogecoin",
         qty: 88888
+    },
+    {
+        id: "tether",
+        qty: 15.891
     }
 ]
 

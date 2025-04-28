@@ -79,6 +79,9 @@ const Portfolio = ({ myHoldings, getHoldings }: any) => {
                     chartPrices={selectedCoin ? selectedCoin?.sparkline_in_7d.value : myHoldings[0]?.sparkline_in_7d?.value}
                 />
                 {/* Assets */}
+                {
+                    console.log("myHoldings before", myHoldings)
+                }
 
                 <FlatList
                     data={myHoldings}

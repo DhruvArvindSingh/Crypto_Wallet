@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
 import MainLayout from './_mainLayout';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { connect } from 'react-redux';
 import { getHoldings, getCoinMarket } from '../../stores/market/marketActions';
@@ -11,6 +12,22 @@ import { BalanceInfo, Chart, IconTextButton } from '../../components';
 const Home = ({ getHoldings, getCoinMarket, myHoldings, coins }: any) => {
 
   const [selectedCoin, setSelectedCoin] = React.useState(null)
+  // const [wallets, setWallets] = React.useState()
+
+  // React.useEffect(() => {
+  //   AsyncStorage.getItem('wallets').then((wallet: any) => {
+  //     const Wallet = JSON.parse(wallet || '[]')
+  //     console.log("Wallet", Wallet);
+  //     let id = Wallet[0].id;
+  //     id = (id == "USDT(polygon)") ? "tether" : id;
+  //     console.log("id", id);
+
+  //     setWallets({
+  //       id: id,
+  //       balance: Wallet[0].balance
+  //     })
+  //   })
+  // }, [])
 
   useFocusEffect(
     React.useCallback(() => {
@@ -25,7 +42,7 @@ const Home = ({ getHoldings, getCoinMarket, myHoldings, coins }: any) => {
   let changePct = (valueChange / totalWallet - valueChange) * 100;
 
   console.log("totalWallet", totalWallet);
-  console.log("myHoldings", myHoldings);
+  console.log("myHoldings in  home", myHoldings);
 
   const renderWalletInfoSection = () => {
     return (

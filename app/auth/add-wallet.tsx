@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Moralis from 'moralis';
 import {
     View,
     Text,
@@ -30,6 +31,7 @@ const blockchainTypes: BlockchainType[] = [
     { id: 'polygon', name: 'Polygon' },
     { id: 'binance-smart-chain', name: 'Binance Smart Chain' },
     { id: 'solana', name: 'Solana' },
+    { id: 'USDT(polygon)', name: 'USDT(polygon)' },
     { id: 'xrp', name: 'XRP' },
     { id: 'kaspa', name: 'KASPA' },
     { id: 'polygon', name: 'Polygon' }
@@ -47,20 +49,28 @@ const AddWallet = () => {
             Alert.alert('Error', 'All fields are required');
             return;
         }
+        console.log("selectedBlockchain", selectedBlockchain);
+        const chain = selectedBlockchain.id === 'USDT(polygon)' ? '0x89' : '0x1';
+        console.log("chain", chain);
+        let response;
 
         setLoading(true);
         try {
 
-            try{
-                const response = await axios.get(`https://rest.cryptoapis.io/addresses-latest/evm/${selectedBlockchain.id}/mainnet/${publicKey}/balance`, {
-                    headers: {
-                        'x-api-key': 'ce9223e56a0ac1aa480985e556435d2476c9c92a'
-                    }
-                })
-                console.log("response", response.data);
-            } catch (error) {
-                console.error('Error fetching balance:', error);
-                Alert.alert('Error', 'Failed to fetch balance. Please try again.');
+            try {
+                await Moralis.start({
+                    apiKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjczMjEyNzVjLTM4ZDQtNGVmMy1iZTcxLTRiZjE2MDZhMmE5YSIsIm9yZ0lkIjoiNDA4MDcyIiwidXNlcklkIjoiNDE5MzEyIiwidHlwZUlkIjoiNDFmZGQ2MGEtYWM3My00ZThiLWIyZWUtODE4MWU2ZGJlMjQ2IiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3MjYwNzk3NTcsImV4cCI6NDg4MTgzOTc1N30.jRtk5QKQTuyO2YNgqYJ39iIPk2TkMW8vL92HVS9-Ljc"
+                });
+
+                response = await Moralis.EvmApi.token.getWalletTokenBalances({
+                    "chain": chain,
+                    "address": publicKey
+                });
+                response = response.raw[0];
+                console.log("response", response);
+
+            } catch (e) {
+                console.error(e);
             }
             // Get existing wallets if any
             const existingWalletsJSON = await AsyncStorage.getItem('wallets');
@@ -71,9 +81,11 @@ const AddWallet = () => {
                 id: Date.now().toString(),
                 publicKey,
                 blockchainType: selectedBlockchain.id,
+                balance: response?.balance ? parseFloat(response.balance) * Math.pow(10, -response.decimals) : 0,
                 blockchainName: selectedBlockchain.name,
                 createdAt: new Date().toISOString()
             };
+            console.log("newWallet", newWallet);
 
             // Add new wallet to list
             wallets.push(newWallet);
