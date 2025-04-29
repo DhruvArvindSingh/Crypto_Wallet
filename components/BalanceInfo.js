@@ -78,7 +78,7 @@ const BalanceInfo = ({ title, displayAmount, changePct, containerStyle }) => {
 
                     }}
                 >{changePct.toFixed(2)}%</Text>
-                
+
                 <Text
                     style={{
                         ...FONTS.h4,

@@ -4,6 +4,7 @@ import MainLayout from './_mainLayout';
 import { connect } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
 import { getHoldings } from '@/stores/market/marketActions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { BalanceInfo, Chart } from '../../components';
 import { SIZES, COLORS, FONTS, dummyData, icons } from "../../constants"
@@ -13,18 +14,69 @@ import { SIZES, COLORS, FONTS, dummyData, icons } from "../../constants"
 const Portfolio = ({ myHoldings, getHoldings }: any) => {
 
 
-    const [selectedCoin, setSelectedCoin] = React.useState(null)
-
+    const [selectedCoin, setSelectedCoin] = React.useState<{
+        sparkline_in_7d?: {
+            value?: number[]
+        }
+    } | null>(null)
+    const [wallets, setWallets] = React.useState<Array<{ id: string, qty: number }>>([])
     useFocusEffect(
         React.useCallback(() => {
-            getHoldings(dummyData.holdings);
+            // Define a function to fetch and set wallet data
+            const fetchWalletData = async () => {
+                try {
+                    const walletJson = await AsyncStorage.getItem('wallets');
+                    const Wallet = JSON.parse(walletJson || '[]');
+                    console.log("Portfolio - Wallet data from AsyncStorage:", Wallet);
+
+                    if (Wallet.length > 0 && Wallet[0].id && Wallet[0].balance !== undefined) {
+                        let id = Wallet[0].blockchainType;
+                        id = (id == "USDT(polygon)") ? "tether" : id;
+                        console.log("Portfolio - Wallet ID:", id);
+
+                        const walletData = [{
+                            id: id,
+                            qty: Wallet[0].balance
+                        }];
+
+                        console.log("Portfolio - Setting wallet data:", walletData);
+                        setWallets(walletData);
+
+                        // Directly call getHoldings with the data we have
+                        console.log("Portfolio - Calling getHoldings with wallet data:", walletData);
+                        getHoldings(walletData);
+                    } else {
+                        console.log("Portfolio - No valid wallets found, using fallback for getHoldings");
+                        // Try with a default coin as fallback for testing
+                        getHoldings([{
+                            id: "bitcoin",
+                            qty: 0.1
+                        }]);
+                    }
+                } catch (error) {
+                    console.error("Portfolio - Error fetching wallet data:", error);
+                    // Fallback to a test coin
+                    getHoldings([{
+                        id: "bitcoin",
+                        qty: 0.1
+                    }]);
+                }
+            };
+
+            // Execute the function
+            fetchWalletData();
         }, [])
     );
 
     let totalWallet = myHoldings.reduce((a: any, b: any) => a + (b.total || 0), 0);
 
     let valueChange = myHoldings.reduce((a: any, b: any) => a + (b.holding_value_change_7d || 0), 0);
-    let changePct = (valueChange / totalWallet - valueChange) * 100;
+    let changePct = totalWallet > 0 ? (valueChange / (totalWallet - valueChange)) * 100 : 0;
+
+    // Add logging to debug values
+    console.log("Portfolio - Total Wallet Value:", totalWallet);
+    console.log("Portfolio - Value Change:", valueChange);
+    console.log("Portfolio - Change Percentage:", changePct);
 
     function renderCurrentBalanceSection() {
         return (
@@ -76,12 +128,10 @@ const Portfolio = ({ myHoldings, getHoldings }: any) => {
                     containerStyle={{
                         marginTop: SIZES.radius
                     }}
-                    chartPrices={selectedCoin ? selectedCoin?.sparkline_in_7d.value : myHoldings[0]?.sparkline_in_7d?.value}
+                    chartPrices={selectedCoin?.sparkline_in_7d?.value || myHoldings[0]?.sparkline_in_7d?.value}
                 />
                 {/* Assets */}
-                {
-                    console.log("myHoldings before", myHoldings)
-                }
+                {/* Debug: myHoldings length = {myHoldings?.length} */}
 
                 <FlatList
                     data={myHoldings}

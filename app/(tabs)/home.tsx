@@ -6,43 +6,111 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { connect } from 'react-redux';
 import { getHoldings, getCoinMarket } from '../../stores/market/marketActions';
 import { useFocusEffect } from '@react-navigation/native';
-import { SIZES, COLORS, FONTS, dummyData, icons } from "../../constants"
+import { SIZES, COLORS, FONTS, icons } from "../../constants"
 import { BalanceInfo, Chart, IconTextButton } from '../../components';
 
 const Home = ({ getHoldings, getCoinMarket, myHoldings, coins }: any) => {
 
-  const [selectedCoin, setSelectedCoin] = React.useState(null)
-  // const [wallets, setWallets] = React.useState()
+  const [selectedCoin, setSelectedCoin] = React.useState<{
+    sparkline_in_7d?: {
+      price?: number[]
+    }
+  } | null>(null)
+  const [wallets, setWallets] = React.useState<Array<{ id: string, qty: number }>>([])
 
   // React.useEffect(() => {
-  //   AsyncStorage.getItem('wallets').then((wallet: any) => {
-  //     const Wallet = JSON.parse(wallet || '[]')
-  //     console.log("Wallet", Wallet);
-  //     let id = Wallet[0].id;
-  //     id = (id == "USDT(polygon)") ? "tether" : id;
-  //     console.log("id", id);
-
-  //     setWallets({
-  //       id: id,
-  //       balance: Wallet[0].balance
-  //     })
-  //   })
   // }, [])
 
   useFocusEffect(
     React.useCallback(() => {
-      getHoldings(dummyData.holdings);
+      console.log("Focus effect triggered");
+
+      // Define a function to fetch and set wallet data
+      const fetchWalletData = async () => {
+        try {
+          const walletJson = await AsyncStorage.getItem('wallets');
+          const Wallet = JSON.parse(walletJson || '[]');
+          console.log("Wallet data from AsyncStorage:", Wallet);
+
+          if (Wallet.length > 0) {
+            // Get the first wallet
+            const firstWallet = Wallet[0];
+
+            // Double check all required fields are present
+            if (!firstWallet.id && firstWallet.blockchainType) {
+              // If id is missing but blockchainType exists, use blockchainType
+              firstWallet.id = firstWallet.blockchainType === 'USDT(polygon)' ? 'tether' : firstWallet.blockchainType;
+            }
+
+            // Make sure we have both id and balance for API call
+            if (firstWallet.id && (firstWallet.balance !== undefined || firstWallet.qty !== undefined)) {
+              const balance = firstWallet.balance !== undefined ? firstWallet.balance : firstWallet.qty;
+              console.log("Wallet ID:", firstWallet.id, "Balance:", balance);
+
+              const walletData = [{
+                id: firstWallet.id,
+                qty: balance
+              }];
+
+              console.log("Setting wallet data:", walletData);
+              setWallets(walletData);
+
+              // Directly call getHoldings with the data we have
+              console.log("Calling getHoldings with wallet data:", walletData);
+              getHoldings(walletData);
+            } else {
+              console.log("Wallet missing required fields, using fallback");
+              useFallbackWallet();
+            }
+          } else {
+            console.log("No wallets found, using fallback");
+            useFallbackWallet();
+          }
+        } catch (error) {
+          console.error("Error fetching wallet data:", error);
+          useFallbackWallet();
+        }
+      };
+
+      // Fallback to use a test coin
+      const useFallbackWallet = () => {
+        console.log("Using fallback test wallet");
+        const testWallet = [{
+          id: "bitcoin",
+          qty: 0.1
+        }];
+        setWallets(testWallet);
+        getHoldings(testWallet);
+      };
+
+      // Execute the function
+      fetchWalletData();
+
+      // Get market data separately
+      console.log("Calling getCoinMarket");
       getCoinMarket();
     }, [])
   );
 
-  let totalWallet = myHoldings.reduce((a: any, b: any) => a + (b.total || 0), 0);
+  console.log("Current state - myHoldings:", myHoldings);
+  console.log("Current state - coins:", coins);
 
-  let valueChange = myHoldings.reduce((a: any, b: any) => a + (b.holding_value_change_7d || 0), 0);
-  let changePct = (valueChange / totalWallet - valueChange) * 100;
+  // Make sure myHoldings exists and is an array
+  const safeMyHoldings = Array.isArray(myHoldings) ? myHoldings : [];
 
-  console.log("totalWallet", totalWallet);
-  console.log("myHoldings in  home", myHoldings);
+  // Calculate wallet total value
+  let totalWallet = safeMyHoldings.reduce((a, b) => a + (b.total || 0), 0);
+
+  // Calculate value change
+  let valueChange = safeMyHoldings.reduce((a, b) => a + (b.holding_value_change_7d || 0), 0);
+
+  // Fix percentage calculation with safety check for division by zero
+  let changePct = totalWallet > 0 ? (valueChange / (totalWallet - valueChange)) * 100 : 0;
+
+  // Log values to debug
+  console.log("Home - Total Wallet:", totalWallet);
+  console.log("Home - Value Change:", valueChange);
+  console.log("Home - Change Percentage:", changePct);
 
   const renderWalletInfoSection = () => {
     return (

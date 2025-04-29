@@ -78,7 +78,7 @@ const AddWallet = () => {
 
             // Create new wallet
             const newWallet = {
-                id: Date.now().toString(),
+                id: selectedBlockchain.id === 'USDT(polygon)' ? 'tether' : selectedBlockchain.id,
                 publicKey,
                 blockchainType: selectedBlockchain.id,
                 balance: response?.balance ? parseFloat(response.balance) * Math.pow(10, -response.decimals) : 0,

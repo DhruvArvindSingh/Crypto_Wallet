@@ -37,7 +37,6 @@ const getWallets = async () => {
 export function getHoldings(holdings = [], currency = "usd", coinList = [], orderBy = "market_cap_desc", sparkline = true, priceChangePerc = "7d", page = 1, perPage = 10) {
     return async dispatch => {
         dispatch(getHoldingsBegin());
-        const wallets = getWallets();
         // let nholdings = [...holdings, ...wallets];
         let ids = holdings.map((coin) => coin.id).join(",");
         let apiUrl = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=${currency}&order=${orderBy}&per_page=${perPage}&page=${page}&sparkline=${sparkline}&price_change_percentage=${priceChangePerc}&ids=${ids}`;
@@ -49,8 +48,8 @@ export function getHoldings(holdings = [], currency = "usd", coinList = [], orde
                 Accept: "application/json",
                 "Content-Type": "application/json",
             },
-        }).then(response => {
-            console.log("Holdings: ", response);
+        }).then((response) => {
+            console.log("Holdings API response:", response);
             if (response.status === 200) {
                 let myholdings = response.data.map((item) => {
                     let coin = holdings.find(a => a.id === item.id);
@@ -72,7 +71,6 @@ export function getHoldings(holdings = [], currency = "usd", coinList = [], orde
                                 }
                             ),
                         },
-
                     }
                 });
                 dispatch(getHoldingsSuccess(myholdings));
@@ -80,6 +78,7 @@ export function getHoldings(holdings = [], currency = "usd", coinList = [], orde
                 dispatch(getHoldingsFailure(response.data));
             }
         }).catch(error => {
+            console.error("Holdings API error:", error);
             dispatch(getHoldingsFailure(error));
         });
 
@@ -103,6 +102,8 @@ export function getCoinMarket(currency = "usd", orderBy = "market_cap_desc", spa
         dispatch(getCoinMarketBegin());
         let apiUrl = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=${currency}&order=${orderBy}&per_page=${perPage}&page=${page}&sparkline=${sparkline}&price_change_percentage=${priceChangePerc}`;
 
+        console.log("CoinMarket API URL:", apiUrl);
+
         return axios({
             url: apiUrl,
             method: "GET",
@@ -111,13 +112,14 @@ export function getCoinMarket(currency = "usd", orderBy = "market_cap_desc", spa
                 "Content-Type": "application/json",
             },
         }).then(response => {
-            console.log("Coin Market: ", response);
+            console.log("Coin Market API response:", response);
             if (response.status === 200) {
                 dispatch(getCoinMarketSuccess(response.data));
             } else {
                 dispatch(getCoinMarketFailure(response.data));
             }
         }).catch(error => {
+            console.error("Coin Market API error:", error);
             dispatch(getCoinMarketFailure(error));
         });
     };
